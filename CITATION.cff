@@ -6,10 +6,10 @@ type: software
 authors:
   - family-names: Itabe
     given-names: Rio
-version: 0.2.0-review-candidate
+version: 0.2.1-review-candidate
 date-released: 2026-07-14
 repository-code: "https://github.com/ritabe-dev/ErdosProblem160-OneThirdUpper"
-url: "https://github.com/ritabe-dev/ErdosProblem160-OneThirdUpper/releases/tag/v0.2.0-review-candidate"
+url: "https://github.com/ritabe-dev/ErdosProblem160-OneThirdUpper/releases/tag/v0.2.1-review-candidate"
 license: MIT
 keywords:
   - additive combinatorics

@@ -90,14 +90,17 @@ since it reverses the same four-element progression.  The Lean definition
 and, when necessary, reversal give the same quantified family.
 
 \begin{definition}
-Let \(\siteH(N)\) be the least positive integer \(q\) for which there is a
-colouring \(c:[N]_0\to[q]\) such that
+For \(N\geq1\), let \(\siteH(N)\) be the least positive integer \(q\) for
+which there is a colouring \(c:[N]_0\to[q]\) such that
 \[
  \bigl|\{c(x_0),c(x_1),c(x_2),c(x_3)\}\bigr|\geq3
  \tag{1.2}
 \]
 for every progression \((1.1)\).
 \end{definition}
+
+The Lean definition \leanname{siteH} is total on \(\N\); at the unused empty
+horizon it has the value \(\leanname{siteH}\ 0=0\).
 
 The maintained Erd\H{o}s Problems page uses this least-good-colours
 quantity~\cite{erdosproblems160}.  Erd\H{o}s's original paper instead denotes

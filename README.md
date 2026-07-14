@@ -29,7 +29,7 @@ lower bound or asymptotic formula is claimed.
 - This preprint has not been peer reviewed.  No claim of priority is made, and
   novelty has not been independently assessed.
 
-The current version is tagged `v0.2.0-review-candidate`.
+The current version is tagged `v0.2.1-review-candidate`.
 
 ## Main Lean theorems
 
@@ -75,6 +75,9 @@ We write `H(N)` for the maintained least-good-colours quantity and
 `h_E(N)` for Erdős's original maximum-bad-partitions quantity.  The Lean
 source bridge proves `H(N) = h_E(N) + 1` for `N ≥ 4`, including the literal
 reading with two distinct nonempty parts.
+
+Lean's `siteH` is total on natural numbers and has the unused endpoint value
+`siteH 0 = 0`; all bounds stated here concern positive `N`.
 
 The dependency and source-statement correspondence is summarized in
 [docs/THEOREM_MAP.md](docs/THEOREM_MAP.md).
