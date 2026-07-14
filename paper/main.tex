@@ -1,0 +1,904 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=30mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\F}{\mathbb F}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
+\newcommand{\clog}{\operatorname{clog}_2}
+\newcommand{\siteH}{H}
+\newcommand{\erdosH}{h_{\mathrm E}}
+\newcommand{\leanname}[1]{\texttt{#1}}
+\hypersetup{
+  pdftitle={A candidate N^(1/3+o(1)) upper bound for Erdos Problem 160},
+  pdfauthor={Rio Itabe}
+}
+
+\title{A candidate \(N^{1/3+o(1)}\) upper bound\\
+for Erd\H{o}s Problem 160}
+\author{Rio Itabe\\\small Independent researcher}
+\date{Preprint, 14 July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\small This manuscript has not been peer reviewed.  It proves an upper-bound
+improvement only and does not solve Erd\H{o}s Problem 160.
+\end{center}
+
+\begin{abstract}
+Let \(\siteH(N)\) be the least number of colours with which
+\(\{1,\ldots,N\}\) can be coloured so that every nonconstant four-term
+arithmetic progression receives at least three distinct colours.  We give a
+concrete construction with explicit palette bounds, after finite choices of a
+prime and a field basis, which for every integer \(k\geq1\) and
+\[
+ N>\max\bigl\{2^{(76k)^2},2^{(40k)^4}\bigr\},
+\]
+satisfies
+\[
+ \siteH(N)^{3k}<2{,}985{,}984^kN^{k+3}.
+\]
+Consequently \(\siteH(N)=O_\varepsilon(N^{1/3+\varepsilon})\) for every
+\(\varepsilon>0\), and eventually
+\(\siteH(N)\leq N^{1/3+\varepsilon}\).  The construction first uses two
+subpower-size digit filters with the property that any progression receiving
+at most two colours from their product has the proper pattern \(ABBA\).  If
+the two \(ABBA\) equalities also hold in a nine-state carry coordinate, the
+associated base-\(p\) digit vectors form a nonconstant affine four-term
+progression in \(\F_p^3\).  After an \(\F_p\)-linear identification with
+\(\F_{p^3}\), the field norm for the chosen prime \(p>3\) cannot take equal
+values simultaneously on the outer pair and on the inner pair.  Hence the
+combined carry-and-norm factor is \(ABBA\)-free and has \(9p\) available
+colours.  We also prove the exact \(+1\) bridge between this
+least-good-colours convention and the
+maximum-bad-partitions convention of Erd\H{o}s's original wording.  The stated
+theorem chain is formalized in Lean 4.
+\end{abstract}
+
+\section{Statement and conventions}
+
+Write \([N]_0=\{0,1,\ldots,N-1\}\), and likewise
+\([q]=\{0,1,\ldots,q-1\}\) for a positive integer \(q\).  A nontrivial four-term arithmetic
+progression is an ordered quadruple
+\[
+ (x_0,x_1,x_2,x_3)=(a,a+d,a+2d,a+3d)
+ \tag{1.1}
+\]
+whose entries lie in \([N]_0\) and whose integer step \(d\) is nonzero.  The
+translation \(x\mapsto x+1\) identifies this convention with progressions in
+\(\{1,\ldots,N\}\).  Allowing the decreasing orientation makes no difference,
+since it reverses the same four-element progression.  The Lean definition
+\texttt{siteH} uses the corresponding increasing four-element set; translation
+and, when necessary, reversal give the same quantified family.
+
+\begin{definition}
+Let \(\siteH(N)\) be the least positive integer \(q\) for which there is a
+colouring \(c:[N]_0\to[q]\) such that
+\[
+ \bigl|\{c(x_0),c(x_1),c(x_2),c(x_3)\}\bigr|\geq3
+ \tag{1.2}
+\]
+for every progression \((1.1)\).
+\end{definition}
+
+The maintained Erd\H{o}s Problems page uses this least-good-colours
+quantity~\cite{erdosproblems160}.  Erd\H{o}s's original paper instead denotes
+by \(h(n)\) the largest number of parts for which every partition is bad:
+the union of two parts contains a four-term progression~\cite{erdos1989}.
+We denote that original extremum by \(\erdosH(N)\), reserving \(\siteH(N)\)
+for the maintained convention.
+For \(N\geq4\), the exact finite definition used below is
+\[
+ \erdosH(N)=
+ \max\left\{\,k\in\N:
+ 2\leq k\leq N\ \text{and every surjective }c:[N]_0\to[k]
+ \text{ is bad}\,\right\},
+\]
+where bad means that some nontrivial four-term progression receives at
+most two colours.  Section~9 proves both that the set is nonempty and that
+this at-most-two formulation agrees with the literal distinct-nonempty-parts
+wording.
+
+\begin{theorem}[Explicit power bound]\label{thm:power}
+For integers \(N,k\geq1\), if
+\[
+ N>\max\bigl\{2^{(76k)^2},2^{(40k)^4}\bigr\},
+ \tag{1.3}
+\]
+then, with \(C=2{,}985{,}984\),
+\[
+ \siteH(N)^{3k}<C^kN^{k+3}.
+ \tag{1.4}
+\]
+\end{theorem}
+
+\begin{corollary}[One-third upper]\label{cor:epsilon}
+For every real \(\varepsilon>0\),
+\[
+ \siteH(N)=O_\varepsilon\bigl(N^{1/3+\varepsilon}\bigr).
+ \tag{1.5}
+\]
+Moreover, for every \(\varepsilon>0\), eventually
+\[
+ \siteH(N)\leq N^{1/3+\varepsilon}.
+ \tag{1.6}
+\]
+For \(N\geq4\), the original convention satisfies
+\[
+ \siteH(N)=\erdosH(N)+1,
+ \tag{1.7}
+\]
+including the literal interpretation in which the two parts are distinct and
+every displayed part is nonempty.
+\end{corollary}
+
+The maintained page currently records the exponent
+\(\log 3/\log 22\approx0.3554\)~\cite{erdosproblems160}.  The family of bounds
+in Corollary~\ref{cor:epsilon} has limiting exponent \(1/3\), and Section~8
+gives the fixed comparison \(7/20<\log3/\log22\).  The digit-filtering
+framework is closely related to Deng--Tidor--Zhao~\cite{dtz} and to Hunter's
+explanation of the recorded bound~\cite{huntercomment}.  A literature search
+did not locate a prior source for the degree-three norm factor composed with
+these filters, but the search was not exhaustive.  We make no claim of
+priority or novelty.
+
+\section{The finite pattern reduction}
+
+Suppose four colours use at most two values.  If no three positions have one
+common colour, then two distinct colours each occur exactly twice.  Up to
+interchanging their names, the only possibilities are
+\[
+ AABB,\qquad ABAB,\qquad ABBA.
+ \tag{2.1}
+\]
+Thus a label excluding every three-equal pattern and \(ABAB\), together with
+an independent label excluding \(AABB\), leaves only the \emph{proper}
+pattern
+\[
+ c_0=c_3,\qquad c_1=c_2,\qquad c_0\ne c_1.
+ \tag{2.2}
+\]
+An additional \(ABBA\)-free label then forces at least three values on the
+original progression.  This elementary classification is the formal theorem
+\nolinkurl{atMostTwo_noThree_aabb_abab_properABBA}.
+
+We construct three labels:
+\begin{enumerate}[label=(\roman*)]
+\item one shared mod-24 label \(\lambda_N\), simultaneously excluding
+      three-equal patterns and \(ABAB\);
+\item a dyadic label \(\mu_N\), excluding \(AABB\);
+\item a cubic label \(\nu_N\), excluding \(ABBA\).
+\end{enumerate}
+Their product is therefore a good colouring.  More explicitly, an
+at-most-two tuple of product colours projects to an at-most-two tuple in each
+factor.  The first two labels then form a proper-\(ABBA\) filter by the
+classification above.  If adjoining the cubic label still left at most two
+product colours, the outer and inner equalities forced by that filter would
+force the two \(ABBA\) equalities in the cubic coordinate, contradicting its
+\(ABBA\)-free property.
+
+\section{Fixed-length digits}
+
+For an integer base \(P>0\), put
+\[
+ Q_j(n)=\left\lfloor\frac{n}{P^j}\right\rfloor,
+ \qquad d_j(n)=Q_j(n)\bmod P.
+ \tag{3.1}
+\]
+If \(0\leq n<P^{L+1}\), then
+\[
+ v_P(n)=(d_0(n),\ldots,d_L(n))\in\Z^{L+1}
+ \tag{3.2}
+\]
+is a canonical fixed-length representation.  In particular,
+\(Q_L(n)<P\), so the top digit is \(d_L(n)=Q_L(n)\).  Equality of all
+coordinates in (3.2) therefore implies equality of the represented integers.
+
+The lower digits \(0,\ldots,L-1\) carry auxiliary no-wrap labels.  The top
+digit needs no auxiliary label: once the lower quotient induction has been
+completed, the progression relation for \(Q_L\) is already the required top
+digit relation.  In all three digit constructions below, the square norm is
+\[
+ \norm{v}^2=\sum_{j=0}^L v_j^2.
+ \tag{3.3}
+\]
+
+We repeatedly use the same quotient-descent step.  If a no-wrap argument
+shows that the current base-\(P\) residues satisfy the progression identities
+as integer equalities, substituting \(n_j=r_j+Pq_j\), subtracting those residue
+identities, and dividing by \(P\) shows that the quotients \(q_j\) form the
+same integer progression.  Iteration exposes every lower digit, and the final
+quotient is the top digit described above.
+
+\section{The shared mod-24 filter}
+
+Fix \(B\geq1\) and set
+\[
+ P=24B+1.
+ \tag{4.1}
+\]
+For \(n<P^{L+1}\), define
+\[
+ \lambda_{P,L}(n)=
+ \left(
+   (d_0(n)\bmod24,\ldots,d_{L-1}(n)\bmod24),
+   \norm{v_P(n)}^2
+ \right).
+ \tag{4.2}
+\]
+The available codomain, not necessarily the attained image, has exactly
+\[
+ S(P,L)=24^L\bigl((L+1)P^2+1\bigr)
+ \tag{4.3}
+\]
+elements.  The extra endpoint in the norm coordinate is a harmless finite
+range containing every possible square norm.
+
+\subsection{A weighted carry-correction lemma}
+
+\begin{lemma}[Weighted digit correction]\label{lem:weighted-carry}
+Let \(\alpha,\beta\) be positive integers with
+\(\alpha+\beta\leq3\), and suppose
+\[
+ \alpha x+\beta y=(\alpha+\beta)z.
+ \tag{4.4}
+\]
+Write \(x=r_x+Pq_x\), and similarly for \(y,z\), with
+\(0\leq r_x,r_y,r_z<P\).  If
+\(r_x\equiv r_y\equiv r_z\pmod {24}\), then
+\[
+ \alpha r_x+\beta r_y=(\alpha+\beta)r_z
+ \tag{4.5}
+\]
+and
+\[
+ \alpha q_x+\beta q_y=(\alpha+\beta)q_z.
+ \tag{4.6}
+\]
+\end{lemma}
+
+\begin{proof}
+Let
+\(E=\alpha r_x+\beta r_y-(\alpha+\beta)r_z\).
+Equation (4.4) gives \(P\mid E\), while the residue hypothesis gives
+\(24\mid E\).  Since \(P=24B+1\), we have \(\gcd(P,24)=1\), hence
+\(24P\mid E\).  On the other hand,
+\(\lvert E\rvert<3P<24P\), so \(E=0\).  Subtracting the resulting digit
+identity from (4.4) and dividing by \(P\) yields (4.6).
+\end{proof}
+
+Iterating Lemma~\ref{lem:weighted-carry} exposes (4.5) in every lower digit
+and preserves (4.4) in every quotient.  The top-quotient observation in
+Section~3 supplies the last digit.
+
+\subsection{Excluding three equal colours}
+
+Each possible triple of positions in a four-term progression has a positive
+weighted relation of the form (4.4):
+\[
+\begin{array}{c@{\qquad}c@{\qquad}c}
+\toprule
+\text{positions}&(x,y;z)&(\alpha,\beta)\\
+\midrule
+012&(x_0,x_2;x_1)&(1,1)\\
+123&(x_1,x_3;x_2)&(1,1)\\
+013&(x_0,x_3;x_1)&(2,1)\\
+023&(x_0,x_3;x_2)&(1,2)\\
+\bottomrule
+\end{array}
+\tag{4.7}
+\]
+If the three \(\lambda_{P,L}\)-colours agree, Lemma
+\ref{lem:weighted-carry} gives digit vectors \(X,Y,Z\) satisfying
+\[
+ \alpha X+\beta Y=(\alpha+\beta)Z
+ \tag{4.8}
+\]
+coordinatewise, and the norm coordinates give
+\(\norm X^2=\norm Y^2=\norm Z^2\).  For every coordinate,
+\[
+ \alpha(X_j-Z_j)^2+\beta(Y_j-Z_j)^2
+ =\alpha X_j^2+\beta Y_j^2-(\alpha+\beta)Z_j^2.
+ \tag{4.9}
+\]
+After summation the right side is zero.  Positivity of the weights and
+nonnegativity of the squares force \(X=Y=Z\).  Digit injectivity forces the
+three integers to be equal, which is impossible for three distinct positions
+of a nontrivial progression.  Thus (4.2) excludes every three-equal pattern.
+
+\subsection{Excluding \(ABAB\) with the same label}
+
+Let \(r_i\) be the current base-\(P\) residues of a four-term progression
+and put \(\delta_i=r_{i+1}-r_i\).  The progression relation before taking
+residues implies
+\[
+ \delta_0=\delta_1+uP,\qquad
+ \delta_2=\delta_1+vP,\qquad u,v\in\{-1,0,1\}.
+ \tag{4.10}
+\]
+Under an \(ABAB\) equality of (4.2),
+\(r_0\equiv r_2\pmod {24}\) and
+\(r_1\equiv r_3\pmod {24}\).  Now
+\[
+ \delta_0-\delta_1=2r_1-r_0-r_2
+ \tag{4.11}
+\]
+is even, whereas \(P\) is odd.  Therefore the first equality in (4.10)
+cannot have \(u=\pm1\), and \(u=0\).  The same parity argument applied to
+\(\delta_2-\delta_1=r_3+r_1-2r_2\) gives \(v=0\).  Iterating this no-wrap
+step through the quotients gives a nonconstant integer vector progression
+\[
+ X,\quad X+R,\quad X+2R,\quad X+3R,
+ \qquad R\ne0.
+ \tag{4.12}
+\]
+The direction \(R\) is nonzero because equality of the fixed-length digit
+vectors would, by Section~3, force equality of the represented integers,
+contrary to the original nontrivial progression.
+
+Put \(A=\ip XR\) and \(D=\norm R^2\).  The two norm equalities in the
+\(ABAB\) pattern give
+\[
+ \begin{aligned}
+ \norm X^2=\norm{X+2R}^2&\quad\Longrightarrow\quad4A+4D=0,\\
+ \norm{X+R}^2=\norm{X+3R}^2&\quad\Longrightarrow\quad4A+8D=0.
+ \end{aligned}
+ \tag{4.13}
+\]
+Hence \(D=0\), so \(R=0\), a contradiction.  The single label
+\(\lambda_{P,L}\) therefore excludes both three-equal patterns and
+\(ABAB\); it is counted only once in the final palette.
+
+\section{The dyadic \(AABB\) filter}
+
+This construction uses the separate base \(B\), not the mod-24 base \(P\).
+For \(0\leq r<B\), define the bucket
+\[
+ \beta(r)=\lfloor\log_2(r+1)\rfloor.
+ \tag{5.1}
+\]
+Equality of buckets implies
+\[
+ y+1<2(x+1),\qquad x+1<2(y+1).
+ \tag{5.2}
+\]
+For \(n<B^{L+1}\), put
+\[
+ \mu_{B,L}(n)=
+ \left(
+   (\beta(d_0(n)),\ldots,\beta(d_{L-1}(n))),
+   \norm{v_B(n)}^2
+ \right).
+ \tag{5.3}
+\]
+
+\begin{lemma}[Dyadic no-wrap]\label{lem:dyadic}
+Suppose four residues \(r_i\in[0,B)\) have congruent consecutive steps
+modulo \(B\), and
+\[
+ \beta(r_0)=\beta(r_1),\qquad
+ \beta(r_2)=\beta(r_3).
+ \tag{5.4}
+\]
+Then their three signed representative steps are equal in \(\Z\).
+\end{lemma}
+
+\begin{proof}
+As in (4.10), write
+\(\delta_0=\delta_1+uB\) and
+\(\delta_2=\delta_1+vB\), where \(u,v\in\{-1,0,1\}\).
+Equivalently,
+\[
+ 2r_1=r_0+r_2+uB,
+ \qquad
+ r_1+r_3=2r_2+vB.
+\]
+The inequalities (5.2) give
+\[
+ r_1\leq2r_0,\qquad r_0\leq2r_1,\qquad
+ r_3\leq2r_2,\qquad r_2\leq2r_3.
+ \tag{5.5}
+\]
+If \(u=-1\), then \(B=r_0+r_2-2r_1\); since \(B>r_2\), this gives
+\(r_0>2r_1\), contradicting (5.5).  Suppose \(u=1\).  Since \(B>r_1\),
+the first displayed identity gives \(r_1>r_0+r_2\).  If \(v=-1\), then
+\(B=2r_2-r_1-r_3>r_2\), so \(r_2>r_1+r_3\), contradicting
+\(r_1>r_2\).  If \(v=0\), then \(r_3=2r_2-r_1\geq0\), whence
+\(r_2>r_0\) and therefore \(r_1>2r_0\), contradicting (5.5).  If
+\(v=1\), the second displayed identity and \(B>r_1\) give
+\(r_3>2r_2\), again contradicting (5.5).  Thus \(u=0\).
+
+Now \(2r_1=r_0+r_2\).  If \(v=-1\), then
+\(r_3=2r_2-r_1-B<r_2-r_1\).  Together with \(r_2\leq2r_3\), this
+gives
+\[
+ 2r_1<r_2\leq r_0+r_2=2r_1,
+\]
+a contradiction.  If \(v=1\), then
+\(B=r_1+r_3-2r_2\).  The inequalities \(B>r_3\) and
+\(B>r_0=2r_1-r_2\) give, respectively,
+\(r_1>2r_2\) and \(r_3>r_1+r_2\).  Since \(r_3\leq2r_2\), the latter
+implies \(r_1<r_2\), a contradiction.  Hence \(v=0\).
+\end{proof}
+
+Quotient induction and the top digit again turn an \(AABB\) equality of
+\(\mu_{B,L}\) into an integer vector progression (4.12).  Its direction is
+nonzero by the same fixed-length digit injectivity argument.  For
+\(Q(t)=\norm{X+tR}^2\), the two adjacent-pair norm equalities give
+\[
+ Q(0)=Q(1)\Longrightarrow2A+D=0,\qquad
+ Q(2)=Q(3)\Longrightarrow2A+5D=0.
+ \tag{5.6}
+\]
+Thus \(D=0\), contradicting \(R\ne0\).  Hence (5.3) is \(AABB\)-free.
+
+The available codomain has cardinality
+\[
+ D(B,L)=\bigl(\lfloor\log_2B\rfloor+1\bigr)^L
+         \bigl((L+1)B^2+1\bigr).
+ \tag{5.7}
+\]
+
+\section{All-horizon parameters and subpower bounds}
+
+Let
+\[
+ q=\clog N,\qquad
+ m=\lfloor\sqrt{q-1}\rfloor+1,\qquad
+ L=m-1,\qquad B=2^m,\qquad P=24B+1.
+ \tag{6.1}
+\]
+Here \(\clog N\) is the least \(q\) with \(N\leq2^q\).  The elementary
+inequality \(q\leq m^2\) yields
+\[
+ N\leq2^{m^2}=B^{L+1}\leq P^{L+1},
+ \tag{6.2}
+\]
+so both preceding digit labels cover \([N]_0\).
+
+For the shared mod-24 factor, (4.3) becomes
+\[
+ S_N=24^{m-1}\bigl(m(24\cdot2^m+1)^2+1\bigr)
+     \leq2^{8m+11}.
+ \tag{6.3}
+\]
+Indeed, \(24^{m-1}\leq2^{5m}\),
+\(P\leq2^{m+5}\), \(m\leq2^m\), and therefore
+\(mP^2+1\leq2^{3m+11}\).
+
+For the dyadic factor, (5.7) gives the exact available cardinality
+\[
+ D_N=(m+1)^{m-1}\bigl(m2^{2m}+1\bigr).
+ \tag{6.4}
+\]
+With \(r=\lceil\log_2(m+1)\rceil\), elementary estimates give
+\[
+ D_N\leq2^{mr+2m+1}\leq2^{5m\sqrt m}.
+ \tag{6.5}
+\]
+
+We use the following explicit thresholds.  A generic palette bounded by
+\(2^{Am+B_0}\) has \(K\)-th power
+less than \(N\) once
+\[
+ N>2^{T^2},\qquad T=\max\{1,2(A+B_0)K\}.
+ \tag{6.6}
+\]
+To see this, put \(s=\lfloor\sqrt{q-1}\rfloor\).  The threshold gives
+\(s\geq T\), while \(m=s+1\leq2s\), so
+\((Am+B_0)K\leq s^2\leq q-1\).  Applying (6.6) to (6.3) with
+\((A,B_0,K)=(8,11,2k)\) gives
+\[
+ N>2^{(76k)^2}\quad\Longrightarrow\quad S_N^{2k}<N.
+ \tag{6.7}
+\]
+
+For (6.5), the sufficient elementary estimate used in the Lean formalization is
+\[
+ N>2^{(20K)^4}\quad\Longrightarrow\quad D_N^K<N.
+ \tag{6.8}
+\]
+It follows by taking \(s=\lfloor\sqrt{q-1}\rfloor\), observing that
+\(s\geq(20K)^2\), and using
+\(5(s+1)\sqrt{s+1}\,K\leq s^2\leq q-1\).
+With \(K=2k\),
+\[
+ N>2^{(40k)^4}\quad\Longrightarrow\quad D_N^{2k}<N.
+ \tag{6.9}
+\]
+Since \(S_N,D_N>0\), (6.7) and (6.9) imply
+\[
+ (S_ND_N)^k<N;
+ \tag{6.10}
+\]
+one may square both sides and use
+\(((S_ND_N)^k)^2=S_N^{2k}D_N^{2k}<N^2\).
+
+\section{The cubic proper-\(ABBA\) factor}
+
+The preceding product leaves only the proper pattern (2.2).  We now exclude
+it with \(O(N^{1/3})\) available colours.
+
+\subsection{A nine-state carry shield}
+
+Let \(p>3\) be prime.  For a residue \(0\leq r<p\), define its third
+\[
+ \tau_p(r)=
+ \begin{cases}
+ 0,&3r<p,\\
+ 1,&p\leq3r<2p,\\
+ 2,&2p\leq3r.
+ \end{cases}
+ \tag{7.1}
+\]
+Write every \(n<p^3\) uniquely as
+\[
+ n=r+p(w+pu),\qquad0\leq r,w,u<p,
+ \tag{7.2}
+\]
+and put
+\[
+ \sigma_p(n)=(\tau_p(r),\tau_p(w))\in\{0,1,2\}^2.
+ \tag{7.3}
+\]
+Only the two carry-bearing digits are labelled, so \(\sigma_p\) has nine
+available values.
+
+\begin{lemma}[Thirds no-wrap]\label{lem:thirds}
+Let \(r_0,r_1,r_2,r_3\in[0,p)\), with their consecutive signed differences
+congruent modulo \(p\).  If
+\[
+ \tau_p(r_0)=\tau_p(r_3),\qquad
+ \tau_p(r_1)=\tau_p(r_2),
+ \tag{7.4}
+\]
+then the three representative differences are equal in \(\Z\).
+\end{lemma}
+
+\begin{proof}
+Let the common outer region in (7.4) be \(a\), and the common inner region
+be \(b\).  Write
+\[
+ 3r_j=\rho_jp+e_j,
+ \qquad 0\leq e_j<p,
+ \qquad
+ \rho_0=\rho_3=a,\qquad \rho_1=\rho_2=b.
+\]
+Every representative difference lies strictly between \(-p\) and \(p\).
+Consequently, relative to the middle difference, there are
+\(u,v\in\{-1,0,1\}\) such that
+\[
+ \delta_0=\delta_1+up,
+ \qquad
+ \delta_2=\delta_1+vp.
+\]
+Put \(d=b-a\in\{-2,-1,0,1,2\}\).  Multiplying the two difference
+identities by \(3\) and using the displayed decompositions gives
+\[
+ (d-3u)p=e_0+e_2-2e_1,
+ \qquad
+ (-d-3v)p=2e_2-e_1-e_3.
+ \tag{7.5}
+\]
+Both right-hand sides lie strictly between \(-2p\) and \(2p\).  Since the
+coefficients on the left are integers, the only possibilities are
+\[
+\begin{array}{c@{\qquad}cc}
+\toprule
+d&u&v\\
+\midrule
+-2&-1&1\\
+-1&0&0\\
+0&0&0\\
+1&0&0\\
+2&1&-1\\
+\bottomrule
+\end{array}
+\]
+When \(d=-2\), subtracting the second equation in (7.5) from the first
+would give
+\[
+ 2p=e_0+e_3-e_1-e_2<2p,
+\]
+which is impossible.  When \(d=2\), subtracting the first equation from the
+second similarly gives
+\[
+ 2p=e_1+e_2-e_0-e_3<2p.
+\]
+Thus the two extreme rows are impossible, and all remaining rows have
+\(u=v=0\), as required.  This argument is formalized as
+\leanname{thirdsRegion\_noWrap}.
+\end{proof}
+
+Apply Lemma~\ref{lem:thirds} first to the low digits in (7.2).  To spell out
+the quotient descent, write \(n_j=r_j+pq_j\).  The original progression
+identities and the exact residue identities give
+\[
+ p(q_0+q_2-2q_1)=0,
+ \qquad
+ p(q_1+q_3-2q_2)=0.
+\]
+Since \(p\ne0\), the quotients \(q_j=s_j+pu_j\) form an integer
+progression.  Apply the lemma again to the middle digits; the same division
+then leaves an integer progression in the high digits.  Thus, whenever a
+nontrivial four-term progression has \(ABBA\) equality under the shield
+(7.3), its integer digit vectors form an affine progression.  Reducing the
+three coordinates modulo \(p\) gives
+\[
+ X,\quad X+R,\quad X+2R,\quad X+3R
+ \tag{7.6}
+\]
+over \(\F_p^3\), with \(R\ne0\).  The shield does not make arbitrary
+progressions carry-free; this conclusion specifically uses the two \(ABBA\)
+shield equalities.  For completeness, \(R\) remains nonzero after reduction:
+the integer digit step is nonzero by injectivity of the fixed-length
+representation, every coordinate has absolute value less than \(p\), and so
+coordinatewise divisibility by \(p\) would force that step to be zero.
+
+\subsection{The degree-three norm}
+
+Let
+\[
+ \overline D_p(n)=(r\bmod p,w\bmod p,u\bmod p)\in\F_p^3
+\]
+be the reduced digit vector from (7.2).  Choose an \(\F_p\)-linear
+isomorphism
+\(\iota_p:\F_p^3\xrightarrow{\sim}\F_{p^3}\), and let
+\[
+ \mathcal N:\F_{p^3}\longrightarrow\F_p
+ \tag{7.7}
+\]
+be the field norm.  On every affine line it is a cubic polynomial:
+\[
+ \mathcal N(X+tR)=at^3+bt^2+ct+d,\qquad a=\mathcal N(R).
+ \tag{7.8}
+\]
+This follows, for example, by writing the norm as the determinant of the
+\(3\times3\) matrix of multiplication and taking the leading determinant.
+
+Apply \(\iota_p\) to (7.6), and denote the resulting base point and nonzero
+direction again by \(X,R\).  Suppose their four norm values have the
+\(ABBA\) pattern.  From \(f(0)=f(3)\) and \(f(1)=f(2)\), where the right
+side of (7.8) is \(f(t)\),
+we obtain
+\[
+ 27a+9b+3c=0,\qquad7a+3b+c=0.
+ \tag{7.9}
+\]
+Subtracting three times the second equation from the first gives \(6a=0\).
+Because \(p>3\), the element \(6\) is nonzero in \(\F_p\), so
+\(\mathcal N(R)=a=0\).  A field norm vanishes only at zero, contradicting
+\(R\ne0\).
+
+It follows that
+\[
+ \nu_p(n)=
+ \left(\sigma_p(n),
+ \mathcal N\bigl(\iota_p(\overline D_p(n))\bigr)\right)
+ \tag{7.10}
+\]
+is \(ABBA\)-free on \([0,p^3)\), with exactly \(9p\) available codomain
+values.
+
+\subsection{A prime for every horizon and the constant}
+
+Let \(q=\clog N\), and define
+\[
+ e=\left\lfloor\frac{q+2}{3}\right\rfloor+2,\qquad y=2^e.
+ \tag{7.11}
+\]
+Then \(y>3\) and \(N\leq y^3\).  Bertrand's postulate supplies a prime
+\(p\) with
+\[
+ y<p\leq2y,
+ \tag{7.12}
+\]
+so \(N\leq p^3\) and (7.10) covers \([N]_0\).  If \(N>1\), then
+\(3e\leq q+8\) and \(2^{q-1}<N\).  Consequently
+\[
+ y^3\leq2^{q+8}<512N,\qquad p^3<4096N.
+ \tag{7.13}
+\]
+Therefore the cubic available palette \(U_N=9p\) satisfies
+\[
+ U_N^3=(9p)^3<729\cdot4096\,N
+ =2{,}985{,}984N.
+ \tag{7.14}
+\]
+No optimization of this uniform constant is intended.
+
+\section{Proof of the main bound}
+
+Take the product colouring
+\[
+ c_N(n)=\bigl(\lambda_N(n),\mu_N(n),\nu_N(n)\bigr).
+ \tag{8.1}
+\]
+The shared label excludes three-equal patterns and \(ABAB\), the dyadic
+label excludes \(AABB\), and the cubic label excludes the remaining proper
+\(ABBA\).  Section~2 therefore shows that every nontrivial four-term
+progression receives at least three product colours.  Hence
+\[
+ \siteH(N)\leq S_ND_NU_N.
+ \tag{8.2}
+\]
+
+Assume (1.3).  Equations (6.10) and (7.14) give
+\[
+\begin{aligned}
+ \siteH(N)^{3k}
+ &\leq(S_ND_N)^{3k}U_N^{3k}\\
+ &<N^3\bigl(2{,}985{,}984N\bigr)^k\\
+ &=2{,}985{,}984^kN^{k+3},
+\end{aligned}
+\tag{8.3}
+\]
+which proves Theorem~\ref{thm:power}.
+
+Taking positive \(3k\)-th roots gives
+\[
+ \siteH(N)<C^{1/3}N^{1/3+1/k}.
+ \tag{8.4}
+\]
+Given \(\varepsilon>0\), choose \(k\) with \(1/k<\varepsilon\).  Equation
+(8.4) first yields (1.5).  For (1.6), put
+\(\delta=\varepsilon-1/k>0\); eventually
+\(C^{1/3}\leq N^\delta\), so the fixed coefficient is absorbed into the
+remaining exponent.
+
+As a completely rational visible comparison, \(k=60\) gives exponent
+\((60+3)/(180)=7/20\).  The integer inequality
+\[
+ 22^7<3^{20}
+ \tag{8.5}
+\]
+implies
+\(7/20<\log3/\log22\), so even this fixed specialization improves the
+exponent recorded on the maintained page.
+
+\section{The original partition convention}
+
+We now justify (1.7) rather than silently identifying two different
+definitions.  Fix \(N\geq4\) and write \(H=\siteH(N)\).  First,
+\(H\leq N\): the injective \(N\)-colouring is good because every nontrivial
+progression has four distinct entries.  Choose a good \(H\)-palette
+colouring and compress its codomain to its image, of size \(\ell\leq H\).
+The compressed colouring is surjective and good.  Minimality of \(H\) forces
+\(\ell=H\), so a surjective good \(H\)-colouring exists.
+
+If a surjective good colouring has \(k<N\) colours, one fibre has at least
+two elements.  Splitting one element into a fresh colour preserves goodness.
+Iteration therefore gives a surjective good colouring for every
+\(H\leq k\leq N\).  Conversely, if \(k<H\), minimality of \(H\) says that
+no \(k\)-colouring is good, so in particular every surjective
+\(k\)-colouring is bad.
+
+No two-colouring is good because the progression \(0,1,2,3\) itself uses at
+most two colours.  Thus \(H\geq3\), the finite set defining \(\erdosH(N)\)
+is nonempty, and the preceding two paragraphs show that its maximum is
+exactly \(H-1\geq2\).
+
+Finally, when \(2\leq k\leq N\), the literal phrase ``the union of two
+distinct nonempty parts contains a progression'' is equivalent to saying
+that some progression uses at most two colours.  If it uses two colours,
+choose those two parts.  If it uses only one, choose that part and any other
+nonempty part.  The converse is immediate.  This proves
+\[
+ \erdosH(N)=\siteH(N)-1\qquad(N\geq4),
+ \tag{9.1}
+\]
+under both readings, and hence (1.7).  The corresponding original-convention
+version of (1.4) is
+therefore
+\[
+ (\erdosH(N)+1)^{3k}<C^kN^{k+3}.
+ \tag{9.2}
+\]
+
+\section{Lean formalization}
+
+The Lean development uses Lean \(4.30.0\) and mathlib \(4.30.0\), pinned by
+the repository manifest.  The principal theorem names are listed below.
+\[
+\begin{array}{p{0.36\textwidth}p{0.56\textwidth}}
+\toprule
+\text{Mathematical role}&\text{Lean theorem}\\
+\midrule
+two-colour classification&
+\nolinkurl{atMostTwo_noThree_aabb_abab_properABBA}\\
+shared mod-24 filter&
+\nolinkurl{horizonNoThreeMod24Colour_isNoThreeEqualColouring},
+\nolinkurl{horizonABABMod24Colour_isABABFreeColouring}\\
+dyadic \(AABB\) filter&
+\nolinkurl{horizonDyadicSquareColour_isAABBFreeColouring}\\
+cubic \(ABBA\) factor&
+\nolinkurl{horizonCubicColour_abba_free}\\
+displayed threshold bridge&
+\nolinkurl{explicitUnifiedOneThirdThreshold_eq_displayed}\\
+exact natural-power bound&
+\nolinkurl{siteH_oneThirdPlusSubpower_unified_displayed}\\
+real epsilon Big-O&
+\nolinkurl{siteH_oneThirdPlusEpsilon_unified_isBigO}\\
+coefficient-one eventual bound&
+\nolinkurl{siteH_le_rpow_oneThird_add_epsilon_eventually}\\
+strict source bridge&
+\nolinkurl{siteH_eq_sourceSurjectiveOriginalH_add_one}\\
+literal distinct-two characterization&
+\nolinkurl{sourceSurjectiveOriginalH_literal_distinct_two_characterization}\\
+\bottomrule
+\end{array}
+\tag{10.1}
+\]
+
+The repository check builds the Lean project, scans the E160 sources for
+\leanname{sorry} and \leanname{admit}, prints the axioms of the listed
+theorems, and verifies the hashes of short source excerpts.  The reported
+axioms are standard Lean/mathlib principles such as propositional
+extensionality, classical choice, and quotient soundness; no project-defined
+axiom or \leanname{sorryAx} is used.
+
+Kernel checking establishes the formal implications represented by the code;
+source interpretation, novelty, and peer review lie outside that check.  No
+asymptotic colouring theorem from~\cite{dtz} is imported: the mod-24 and
+dyadic constructions used above are proved explicitly in the Lean development.
+
+\section{LLM assistance}
+
+LLMs accessed through ChatGPT Pro and OpenAI Codex, primarily GPT-5.6, were
+used during proof exploration, Lean formalization, testing, and editing.  The
+author is responsible for the manuscript and code; LLM outputs were not
+treated as proof or independent review.
+
+\begin{thebibliography}{9}
+
+\bibitem{erdos1989}
+P.~Erd\H{o}s,
+\emph{Some problems and results on combinatorial number theory},
+in Graph Theory and Its Applications: East and West, Annals of the New York
+Academy of Sciences 576 (1989), 132--145.  Problem passage on printed
+p.~143.
+
+\bibitem{dtz}
+M.~Deng, J.~Tidor, and Y.~Zhao,
+\emph{Uniform sets with few progressions via colorings},
+Mathematical Proceedings of the Cambridge Philosophical Society 179 (2025),
+79--103; \href{https://arxiv.org/abs/2307.06914}{arXiv:2307.06914}.
+
+\bibitem{erdosproblems160}
+T.~Bloom, ed.,
+\emph{Erd\H{o}s Problem 160}, maintained problem page,
+\url{https://www.erdosproblems.com/160}, accessed 14 July 2026.
+
+\bibitem{huntercomment}
+Z.~Hunter,
+comment on Erd\H{o}s Problem 160,
+\url{https://www.erdosproblems.com/forum/thread/160}, posted 18 October 2025
+(displayed time has no stated timezone), accessed 14 July 2026.
+
+\bibitem{lean}
+L.~de Moura and S.~Ullrich,
+\emph{The Lean 4 theorem prover and programming language},
+Automated Deduction -- CADE 28, Lecture Notes in Computer Science 12699
+(2021), 625--635.
+
+\end{thebibliography}
+
+\end{document}

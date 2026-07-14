@@ -1,0 +1,15 @@
+E160 primary-source audit excerpt
+
+Source type: primary source
+URL: https://users.renyi.hu/~p_erdos/1989-35.pdf
+Retrieved: 2026-07-14 05:27:48 JST (UTC+09:00)
+PDF location: PDF page 12; printed page 143
+PDF SHA-256: ce525a816bc16714a8c5b1a1db9f272c5715bfe8b735a515b8d11d39204182dc
+
+Short verbatim excerpt:
+"Let h(n) be the largest integer for which if we decompose the integers 1, 2, ..., n into h(n) disjoint sets"
+
+Context (paraphrase): Erdős then requires that two parts always have a union
+containing a four-term arithmetic progression, and asks to determine or
+estimate h(n). The source does not explicitly state that every displayed part
+must be nonempty.

@@ -1,0 +1,15 @@
+E160 maintained-page audit excerpt
+
+Source type: maintained secondary problem record
+URL: https://www.erdosproblems.com/160
+Retrieved: 2026-07-14 05:27:48 JST (UTC+09:00)
+HTML SHA-256: 6935c3837ccd34022fb62b61b10e6501fce7f2c95664ff79b724e0ce41052a84
+
+Short verbatim excerpt:
+"OPEN"
+"Let h(N) be the smallest k such that {1,...,N} can be coloured with k colours"
+
+Context (paraphrase): the colouring must give at least three distinct colours
+to every four-term arithmetic progression. The maintained page records the
+upper exponent log(3)/log(22) and lower logarithmic exponent 1/9. It also says
+that a finite computation cannot resolve the open problem.

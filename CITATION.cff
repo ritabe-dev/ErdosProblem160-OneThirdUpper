@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: >-
+  This is an unreviewed research preprint. Please cite the tagged version.
+title: "A candidate one-third upper bound for Erdős Problem 160"
+type: software
+authors:
+  - family-names: Itabe
+    given-names: Rio
+version: 0.2.0-review-candidate
+date-released: 2026-07-14
+repository-code: "https://github.com/ritabe-dev/ErdosProblem160-OneThirdUpper"
+url: "https://github.com/ritabe-dev/ErdosProblem160-OneThirdUpper/releases/tag/v0.2.0-review-candidate"
+license: MIT
+keywords:
+  - additive combinatorics
+  - arithmetic progressions
+  - Lean 4
+  - formalization

@@ -1,0 +1,16 @@
+/.lake/
+/paper/*.aux
+/paper/*.bbl
+/paper/*.bcf
+/paper/*.blg
+/paper/*.fdb_latexmk
+/paper/*.fls
+/paper/*.log
+/paper/*.toc
+/paper/*.xdv
+/paper/main.pdf
+/paper/*.out
+/paper/*.run.xml
+/paper/*.synctex.gz
+/output/pdf/rendered*/
+.DS_Store

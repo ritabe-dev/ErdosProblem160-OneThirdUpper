@@ -1,0 +1,14 @@
+E160 DTZ primary-paper audit excerpt
+
+Source type: primary research paper
+URL: https://arxiv.org/pdf/2307.06914
+Retrieved: 2026-07-14 05:27:48 JST (UTC+09:00)
+PDF location: page 2; tensor lemma on page 10
+PDF SHA-256: 7a16abfa4b0a2a48df1dbf3d63dfea4b72063b24c454643881b7f99b1f7e1543
+
+Short verbatim excerpt:
+"Here is a 3-coloring of Z/22Z that avoids symmetrically colored 4-APs (found by computer search): 1333221232131211333233."
+
+Context (paraphrase): Lemma 5.1 tensors any such finite cyclic seed digitwise.
+The paper states a subpolynomial-colouring conjecture and says that the authors
+were unable to resolve it.
